@@ -22,22 +22,22 @@ namespace AppSec_Assignment.Pages
         public string WAI { get; set; }
 
         private readonly ILogger<IndexModel> _logger;
-        private readonly UserManager<NewUser> _userManager;
-        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly UserManager<NewUser> userManager;
+        private readonly IHttpContextAccessor contextAccessor;
         private readonly SignInManager<NewUser> signInManager;
 
 
         public IndexModel(ILogger<IndexModel> logger, UserManager<NewUser> userManager, IHttpContextAccessor contextAccessor, SignInManager<NewUser> signInManager)
         {
             _logger = logger;
-            _userManager = userManager;
-            _contextAccessor = contextAccessor;
+            this.userManager = userManager;
+            this.contextAccessor = contextAccessor;
             this.signInManager = signInManager;
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await userManager.GetUserAsync(User);
             await SessionCheck();
 
             var protectYourData = DataProtectionProvider.Create("EncryptData");
@@ -52,14 +52,14 @@ namespace AppSec_Assignment.Pages
             LOG = user.Logs;
             WAI = user.WAI;
 
-            _contextAccessor.HttpContext.Session.SetString("FirstName", FirstName);
-            _contextAccessor.HttpContext.Session.SetString("LastName", LastName);
-            _contextAccessor.HttpContext.Session.SetString("Gender", Gender);
-            _contextAccessor.HttpContext.Session.SetString("Email", Email);
-            _contextAccessor.HttpContext.Session.SetString("NRIC", NRIC);
-            _contextAccessor.HttpContext.Session.SetString("DOB", DOB.ToString("MM/dd/yyyy"));
-            _contextAccessor.HttpContext.Session.SetInt32("LOG", LOG);
-            _contextAccessor.HttpContext.Session.SetString("WAI", WAI);
+            //contextAccessor.HttpContext.Session.SetString("FirstName", FirstName);
+            //contextAccessor.HttpContext.Session.SetString("LastName", LastName);
+            //contextAccessor.HttpContext.Session.SetString("Gender", Gender);
+            //contextAccessor.HttpContext.Session.SetString("Email", Email);
+            //contextAccessor.HttpContext.Session.SetString("NRIC", NRIC);
+            contextAccessor.HttpContext.Session.SetString("DOB", DOB.ToString("MM/dd/yyyy"));
+            //contextAccessor.HttpContext.Session.SetInt32("LOG", LOG);
+            //contextAccessor.HttpContext.Session.SetString("WAI", WAI);
             return Page();
         }
         private async Task SessionCheck()
@@ -73,7 +73,7 @@ namespace AppSec_Assignment.Pages
                 HttpContext.Session.Clear();
                 Response.Cookies.Delete("AuthToken");
                 Response.Cookies.Delete(".AspNetCore.Session");
-                RedirectToPage("/Login");
+                RedirectToPage("/errors/500");
             }
         }
     }
