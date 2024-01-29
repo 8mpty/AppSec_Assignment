@@ -19,7 +19,6 @@ namespace AppSec_Assignment.Pages
 		{
 			await signInManager.SignOutAsync();
             HttpContext.Session.Clear();
-            Response.Cookies.Delete("MyCookieAuth");
             Response.Cookies.Delete("AuthToken");
             Response.Cookies.Delete(".AspNetCore.Session");
             return RedirectToPage("Login");

@@ -1,6 +1,7 @@
 using AppSec_Assignment.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,17 +13,13 @@ builder.Services.AddIdentity<NewUser, IdentityRole>(options =>
     options.Lockout.AllowedForNewUsers = true;
     options.Lockout.MaxFailedAccessAttempts = 3;
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
-}).AddEntityFrameworkStores<AuthDbContext>();
-
-builder.Services.AddAuthentication("MyCookieAuth")
-	.AddCookie("MyCookieAuth", options =>
-{
-	options.Cookie.Name = "MyCookieAuth";
-});
+}).AddEntityFrameworkStores<AuthDbContext>().AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(Config =>
 {
 	Config.LoginPath = "/Login";
+    Config.LogoutPath = "/Logout";
+
 });
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -31,6 +28,8 @@ builder.Services.AddSession(options =>
 {
 	options.IdleTimeout = TimeSpan.FromSeconds(30);
 });
+
+builder.Services.AddDataProtection();
 
 var app = builder.Build();
 

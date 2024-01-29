@@ -29,7 +29,7 @@ namespace AppSec_Assignment.Pages
 			this.signInManager = signInManager;
 			this.userManager = userManager;
 		}
-		public void OnGet() {}
+
 		public async Task<bool> ValidateCaptcha()
 		{
 			bool result = true;
@@ -70,24 +70,8 @@ namespace AppSec_Assignment.Pages
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> OnPostAsync()
 		{
-            var sessionAuthToken = HttpContext.Session.GetString("AuthToken");
-            var cookieAuthToken = Request.Cookies["AuthToken"];
 
-            if (sessionAuthToken == null || !sessionAuthToken.Equals(cookieAuthToken))
-            {
-                await signInManager.SignOutAsync();
-                HttpContext.Session.Clear();
-
-                Response.Cookies.Delete("MyCookieAuth");
-                Response.Cookies.Delete("AuthToken");
-                Response.Cookies.Delete(".AspNetCore.Session");
-                Response.Redirect("/Login");
-            }
-            var authToken = Guid.NewGuid().ToString();
-			HttpContext.Session.SetString("AuthToken", authToken);
-			Response.Cookies.Append("AuthToken", authToken);
-
-			if (ModelState.IsValid)
+            if (ModelState.IsValid)
 			{
 				bool isCaptchaValid = await ValidateCaptcha();
 
@@ -98,38 +82,27 @@ namespace AppSec_Assignment.Pages
 				}
                 var user = await userManager.FindByEmailAsync(LModel.Email);
 
-                var alreadyLoggedIn = HttpContext.Session.GetString("AlreadyLoggedIn");
-                if (alreadyLoggedIn != null && alreadyLoggedIn.Equals("true"))
-                {
-                    await signInManager.SignOutAsync();
-                    HttpContext.Session.Clear();
-                    Response.Cookies.Delete("MyCookieAuth");
-                    Response.Cookies.Delete("AuthToken");
-                    Response.Cookies.Delete(".AspNetCore.Session");
-                    return RedirectToPage("/errors/403");
-                }
-
-                var identityResult = await signInManager.PasswordSignInAsync(LModel.Email, LModel.Password, LModel.RememberMe, false);
+                var identityResult = await signInManager.PasswordSignInAsync(LModel.Email, LModel.Password, LModel.RememberMe, lockoutOnFailure: true);
 				if (identityResult.Succeeded)
 				{
-					user.Logs += 1;
-                    var claims = new List<Claim>
-					{
-						new Claim(ClaimTypes.Name, "c@c.com"),
-						new Claim(ClaimTypes.Email, "c@c.com")
-					};
-					var i = new ClaimsIdentity(claims, "MyCookieAuth");
-					ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(i);
-					await HttpContext.SignInAsync("MyCookieAuth", claimsPrincipal);
+                    var authToken = Guid.NewGuid().ToString();
+                    HttpContext.Session.SetString("AuthToken", authToken);
+                    Response.Cookies.Append("AuthToken", authToken);
+
+                    user.Logs += 1;
 					await userManager.UpdateAsync(user);
-                    HttpContext.Session.SetString("AlreadyLoggedIn", "true");
                     return RedirectToPage("Index");
 				}
-				else
-				{
-					ModelState.AddModelError("", "Username or Password incorrect");
-				}
-			}
+
+                if (identityResult.IsLockedOut)
+                {
+                    ModelState.AddModelError("", "Account locked out. Please try again later.");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Username or Password incorrect");
+                }
+            }
 			return Page();
 		}
 	}
