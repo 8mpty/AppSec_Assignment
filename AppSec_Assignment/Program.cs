@@ -45,14 +45,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseSession();
-
 app.UseStatusCodePagesWithRedirects("/errors/{0}");
-
 app.UseRouting();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
+
 
 app.MapRazorPages();
 

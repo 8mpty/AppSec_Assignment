@@ -33,8 +33,7 @@ namespace AppSec_Assignment.ViewModels
 
         [Required]
         [DataType(DataType.Password)]
-        [MinLength(12, ErrorMessage = "Passwords must be at least 12 characters long and contain at least an upper\r\ncase letter, lower case letter, digit and a symbol")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{12,}$", ErrorMessage = " ")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{12,}$", ErrorMessage = "Passwords must be at least 12 characters long and contain at least an upper\r\ncase letter, lower case letter, digit and a symbol")]
         public string Password { get; set; }
 
 
@@ -43,14 +42,14 @@ namespace AppSec_Assignment.ViewModels
         [Compare(nameof(Password), ErrorMessage = "Password and confirmation password does not match")]
         public string ConfirmPassword { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Date of Birth is required")]
         [DataType(DataType.Date)]
         [Display(Name = "Date of Birth")]
 		[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
 		[CustomValidation(typeof(Register), "ValidateDateOfBirth")]
 		public DateTime DateOfBirth { get; set; }
 
-		public static ValidationResult ValidateDateOfBirth(DateTime dateOfBirth, ValidationContext context)
+		public static ValidationResult ValidateDateOfBirth(DateTime? dateOfBirth, ValidationContext context)
 		{
 			if (dateOfBirth >= DateTime.Now.Date)
 			{
