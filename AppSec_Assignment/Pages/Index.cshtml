@@ -1,0 +1,56 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<style>
+    .rounded-input {
+        border-radius: 8px;
+        padding: 8px;
+    }
+
+    .rounded-textarea {
+        border-radius: 8px;
+        padding: 8px;
+        width: 300px;
+        height: 250px;
+    }
+</style>
+
+<div class="text-left">
+    <div>
+        <h3>User Information</h3>
+        <p>
+            <strong>Email:</strong>
+            <input type="text" value="@Html.DisplayFor(model => model.Email)" readonly class="rounded-input">
+        </p>
+        <p>
+            <strong>First Name:</strong>
+            <input type="text" value="@Html.DisplayFor(model => model.FirstName)" readonly class="rounded-input">
+        </p>
+        <p>
+            <strong>Last Name:</strong>
+            <input type="text" value="@Html.DisplayFor(model => model.LastName)" readonly class="rounded-input">
+        </p>
+        <p>
+            <strong>Gender:</strong>
+            <input type="text" value="@Html.DisplayFor(model => model.Gender)" readonly class="rounded-input">
+        </p>
+        <p>
+            <strong>NRIC:</strong>
+            <input type="text" value="@Html.DisplayFor(model => model.NRIC)" readonly class="rounded-input">
+        </p>
+        <p>
+            <strong>Date of Birth:</strong>
+            <input type="text" value="@HttpContext.Session.GetString("DOB")" readonly class="rounded-input">
+        </p>
+        <p>
+            <strong>Login Count:</strong>
+            <input type="text" value="@Html.DisplayFor(model => model.LOG)" readonly class="rounded-input">
+        </p>
+
+        <p><strong>Who Am I:</strong></p>
+        <textarea readonly class="rounded-textarea" asp-for="WAI"></textarea>
+    </div>
+</div>
